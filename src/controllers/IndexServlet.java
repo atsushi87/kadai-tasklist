@@ -18,7 +18,7 @@ import utils.DBUtil;
  */
 @WebServlet("/index")
 public class IndexServlet extends HttpServlet {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     /**
      * @see HttpServlet#HttpServlet()
@@ -28,19 +28,34 @@ public class IndexServlet extends HttpServlet {
         // TODO Auto-generated constructor stub
     }
 
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-	 */
+    /**
+     * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+     */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         EntityManager em = DBUtil.createEntityManager();
-
+        int page = 1;
+        try{
+            page = Integer.parseInt(request.getParameter("page"));
+        }catch(NumberFormatException e){
+            e.printStackTrace();
+        }
         List<Task> tasks = em.createNamedQuery("getAllTasks", Task.class)
-                                   .getResultList();
-        response.getWriter().append(Integer.valueOf(tasks.size()).toString());
+                .setFirstResult(10 * (page -1))
+                .setMaxResults(10)
+                .getResultList();
+        long tasks_count = (long)em.createNamedQuery("getTasksCount", Long.class).getSingleResult();
 
         em.close();
+
+        request.setAttribute("tasks", tasks);
+        request.setAttribute("tasks_count", tasks_count);
+        request.setAttribute("page", page);
+        if(request.getSession().getAttribute("flush") != null){
+            request.setAttribute("flush", request.getSession().getAttribute("flush"));
+            request.getSession().removeAttribute("flush");
+        }
+
+        request.getRequestDispatcher("WEB-INF/views/task/index.jsp").forward(request, response);
     }
-
-
 
 }
