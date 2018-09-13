@@ -8,13 +8,26 @@
       </div>
     </c:if>
     <h2>タスク一覧</h2>
-    <ul>
+        <table>
+          <tbody>
+            <tr>
+              <th>タスクID</th>
+              <th>
+                タスク内容
+              </th>
+            </tr>
       <c:forEach var="task" items="${tasks }">
-        <li><a href="${pageContext.request.contextPath}/show?id=${task.id}"> <c:out value="${task.id }" />
-        </a> : <c:out value="${task.content }" /></li>
+      <tr>
+      <td><a href="${pageContext.request.contextPath }/show?id=${task.id}">
+            <c:out value="${task.id }"/></a>
+      </td>
+      <td><c:out value="${task.content}" />
+      </td>
+      </tr>
       </c:forEach>
-    </ul>
-    <div id="pagination">
+          </tbody>
+        </table>
+          <div id="pagination">
       (全 ${tasks_count} 件) <br />
       <c:forEach var="i" begin="1" end="${((tasks_count - 1) / 10) + 1}" step="1">
         <c:choose>
